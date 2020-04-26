@@ -4,6 +4,8 @@ __pycache__/
 # Jupyter Notebook
 .ipynb_checkpoints
 
+AECCAR0
+AECCAR2
 
-
-
+*.npy
+!layer_0.npy
