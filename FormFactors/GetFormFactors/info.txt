@@ -1,0 +1,14 @@
+1. edist_atom files are 3d numpy arrays of electron density of single atoms. Numbers in the name show the center coordination of the atom.
+
+2. You can produce edist atoms from the CHGFileAnalysis folder.
+
+3. Three notebooks are for 3 different atoms (Ti,Al,N)
+
+4. There is only one atom for each atom type because all of them are similar. (All N atoms have similar atomic form factors for instance. )
+
+5. There are two form factors for each atom. One is in 100 and other is in 111 direction. They are similar though. spherical symmetry is somewhat accurate.
+
+6. Python script is used for plotting atomic form factors. It also produces a json file where the coefficients of the analytic fit is kept. (Just like ICT coefficients)
+
+
+
