@@ -70,7 +70,7 @@ def plot_profiles_amplitudes(*args, structure = None,labellist = None):
     ax.set_ylim([0, 130])
     
     ax.scatter(XRD.x, np.multiply(XRD.y, 1.0), marker='X',color = 'b',label = 'Ab initio form factors')
-    ax.scatter(XRD2.x, np.multiply(XRD2.y, 1.0), marker='X',color = 'r',label = 'ict form factors')
+    ax.scatter(XRD2.x, np.multiply(XRD2.y, 1.0), marker='X',color = 'r',label = 'Ict form factors')
     for i,j in zip(XRD.x,np.multiply(XRD.y, 1.0)):
         ax.plot([i,i],[0,j],linestyle = '--', color = 'b' ,alpha = 0.5)
     for i,j in zip(XRD2.x,np.multiply(XRD2.y, 1.0)):
@@ -99,9 +99,8 @@ def plot_profiles_amplitudes(*args, structure = None,labellist = None):
     plt.show()
     
 if __name__ == '__main__':
-        
+    
     D5000 = pd.read_excel('D5000_560.xlsx',sheet_name='DeconvSample')
-    #GADDS = pd.read_excel('GADDS_asdep.xlsx',sheet_name='DeconvSample')
     TiAlN_perfect      = create_perfect_TiAlN_structure(700, 4.16)
-##    plot_profiles_amplitudes(GADDS,D5000, structure = TiAlN_perfect,labellist = ['GADDS','D5000'])
-    plot_profiles_amplitudes(D5000, structure = TiAlN_perfect,labellist = ['D5000'])
+       
+    plot_profiles_amplitudes(D5000, structure = TiAlN_perfect,labellist = ['Experimental'])
