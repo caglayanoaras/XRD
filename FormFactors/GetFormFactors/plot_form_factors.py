@@ -145,8 +145,10 @@ def fit_func(w_array_dft, a,b,c,d,e,f,g,h,i,j):
     return res
 
 def fit_form_analytically(wlist, formfact ):
-    
-    popt, pcov   = curve_fit(fit_func, wlist,formfact, bounds=(-400,400), maxfev=10000)
+    try:
+        popt, pcov   = curve_fit(fit_func, wlist,formfact, bounds=(-600,600), maxfev=10000)
+    except:
+        popt, pcov   = curve_fit(fit_func, wlist,formfact, bounds=(-1000,1000), maxfev=10000)
 
     plt.title('quick check')
     plt.plot(w_array_dft,fit_func(w_array_dft, *popt))
