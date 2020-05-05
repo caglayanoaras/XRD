@@ -7,7 +7,7 @@ from os.path import isfile, join
 import numpy as np
 import matplotlib.pyplot as plt
 
-center = np.array([192*3,192*3,192*3]) # Center loc of atom
+center = np.array([192*2, 192*1, 192*3]) # Center loc of atom
 all_layers = np.arange(768)
 start      = (center[2] - 96)
 stop       = (center[2] +96)
