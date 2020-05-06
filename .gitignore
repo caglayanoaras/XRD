@@ -12,3 +12,5 @@ AECCAR2
 !edist_atom_192_192_192.npy
 !edist_atom_192_384_192.npy
 !edist_atom_576_576_576.npy
+
+delete/

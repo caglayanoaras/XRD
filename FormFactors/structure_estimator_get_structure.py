@@ -16,7 +16,7 @@ typ = 'dft'
 def error_func(structure, measurement):
     
     calc = XRDCalculator(wavelength="CuKa1", typ = typ)
-    XRD = calc.get_pattern(structure,two_theta_range=(30, 105),scaled = True)
+    XRD = calc.get_pattern(structure,two_theta_range=(37, 96),scaled = True)
     theta_calculated = (np.around(XRD.x, 1))
     two_theta_list = [37.4, 43.5, 63.2, 75.8, 79.8, 95.6 ]
     indexes = []
@@ -37,9 +37,9 @@ if __name__ == '__main__':
     spec = Spectrum(x,y)
     spec.normalize(mode = 'max', value = 100)
     
-    EPOCHS = 400
+    EPOCHS = 800
     UNIT_COST = 0.008
-    RISE = 1.025
+    RISE = 1.009
 
     
     print('Initial error:{}'.format(error_func(TiAlN_perfect,spec.y)))
@@ -60,27 +60,35 @@ if __name__ == '__main__':
         el = predicted_structure[ind].species.formula
         if 'N' in el:
             predicted_structure[ind].species = mg.Composition('V1')
+            print('N > V')
         if 'Ti'in el:
             dice = random.randint(0,1 )
-            if dice:
+            if dice == 0:
                 predicted_structure[ind].species = mg.Composition('V1')
-            else:
+                print('Ti > V')
+            if dice == 1:
                 predicted_structure[ind].species = mg.Composition('Al1')
+                print('Ti > Al')
         if 'Al'in el:
             dice = random.randint(0,1 )
             if dice:
                 predicted_structure[ind].species = mg.Composition('V1')
+                print('Al > V')
             else:
                 predicted_structure[ind].species = mg.Composition('Ti1')
-        if 'Vl'in el:
+                print('Al > Ti')
+        if 'V'in el:
             if ind < metal_count:
                 dice = random.randint(0,1 )
-                if dice:
+                if dice==0:
                     predicted_structure[ind].species = mg.Composition('Ti1')
-                else:
+                    print('V > Ti')
+                if dice==1:
                     predicted_structure[ind].species = mg.Composition('Al1')
+                    print('V > Al')
             if ind >= metal_count:
                 predicted_structure[ind].species = mg.Composition('N1')
+                print('V > N')
                 
         energy_predicted = error_func(predicted_structure,spec.y)
 
