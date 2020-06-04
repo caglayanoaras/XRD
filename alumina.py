@@ -154,7 +154,7 @@ print(uvw_GADDS)
 f5, ax1 = plt.subplots()
 
 ax1.scatter(peak_two_thetas_GADDS , fwhm_GADDS , color = 'b', label = 'GADDS')
-ax1.plot(spec_GADDS.x, [functions.caglioti(i, *uvw_GADDS) for i in spec_GADDS.x], 'r-')
+ax1.plot(spec_GADDS.x, [functions.caglioti(i, *uvw_GADDS) for i in spec_GADDS.x], 'r-', label = 'Caglioti Fit')
 
 ax1.scatter(peak_two_thetas_D5000 , fwhm_D5000, color = 'k', label = 'D5000' )
 ax1.plot(spec_D5000.x, [functions.caglioti(i, *uvw_D5000) for i in spec_D5000.x], 'r-')
