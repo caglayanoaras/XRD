@@ -1,41 +1,49 @@
-# This script will read TiAlN out files.
-# Returns an xlsx file which provides line profile paramaters both for deconvoluted and raw data.
-
+'''
+    This module reads an out file produced by GADDS under bragg-brentano
+    condition. Produces an excel file with Raw and
+    Deconv sheets. 
+'''
 import XRDLib            as functions
 import pandas            as pd
 import numpy             as np
 import matplotlib.pyplot as plt
-import matplotlib        as mlt
+
 from pymatgen.core.spectrum import Spectrum
-from sklearn.preprocessing  import PolynomialFeatures
-from sklearn.linear_model   import LinearRegression
-from scipy.optimize         import curve_fit
 from os                     import listdir
 from os.path                import isfile, join
-fraction_inst        = 0.3
-wavelength           = 1.54056 # CuKa1 in Angstrom
-name_of_exceloutput  = 'GADDS_asdep.xlsx'
-name_of_outfileinput = 'outFiles//GADDS//asdepbb'
-outfiles             = [f for f in listdir(name_of_outfileinput) if isfile(join(name_of_outfileinput, f))]
-print(outfiles)
+
 plt.style.use(['seaborn-paper', 'presentation'])
 
+#-*-*-*-*-*-*-*-*-*-*-*-*-INPUT-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+fraction_inst        = 0.2     #Instrumental broadening fraction. Check alumina.py
+wavelength           = 1.54056 # CuKa1 in Angstrom
+deg_of_bck_poly      = 5       # Degree of background polynomial. Integer
+name_of_exceloutput  = 'GADDS_asdep.xlsx'
+name_of_outfileinput = 'outFiles//GADDS//asdepbb'
+
+#Enter expected peaks for smooth fitting
+expected_peaks       = [[37.37] , [43.35] , [63.29], [75.9],[79.8], [95.6]]
+
+#Enter UVW parameters obtained from alumina.py module.
+if 'D5000' in name_of_outfileinput:
+    uvw = [ 0.00556691, -0.00089748,  0.00282308] #D5000
+if 'GADDS' in name_of_outfileinput:
+    uvw = [ 0.04586492, 0.0146818  ,  0.01856546] #GADDS
+    
+#-*-*-*-*-*-*-*-*-*-*-*-*-INPUT-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+outfiles             = [f for f in listdir(name_of_outfileinput) if isfile(join(name_of_outfileinput, f))]
+print('Out files: ', outfiles)
+
+#Read from out file
 intensities = []
 two_thetas = []
-
 
 for out in outfiles:
     print(out)
     two_theta,intensity = functions.read_out_file(name_of_outfileinput+ '//' + out)
     intensities.append(intensity)
     two_thetas.append(two_theta)
-
-
-#Enter expected peaks for smooth fitting
-# INPUT 
-expected_peaks = [[37.37] , [43.35] , [63.29], [75.9],[79.8], [95.6]]
-
-# INPUT 
 
 fwhm= []
 peak_two_thetas = []
@@ -89,88 +97,38 @@ for c,peak in enumerate(expected_peaks):
 
 d_hkl  = [wavelength/2/np.sin(np.pi/360*i) for i in peak_two_thetas]
 
-#Enter UVW parameters obtained from alumina.py module.
-# INPUT  
-##uvw_D5000 = [ 0.00556691, -0.00089748,  0.00282308]
-uvw_GADDS = [0.04586492, 0.0146818,  0.01856546]
-# INPUT 
-
-
-#Deconvolution
-al_fwhm     = [functions.caglioti(i,*uvw_GADDS) for i in peak_two_thetas]
+al_fwhm     = [functions.caglioti(i,*uvw) for i in peak_two_thetas]
 al_fraction = [fraction_inst] *len(al_fwhm)  # 0 for gaussian
 
+#Deconvolution
 deconv_fwhm            = []
 deconv_fraction        = []
 deconv_amplitude       = []
 deconv_peak_two_thetas = []
+def deconvolution():
 
-for i in range(6):
-    _,deconv_popt = functions.get_deconvoluted_profile(fwhm,peak_two_thetas,amplitude,fraction,d_hkl,al_fwhm,al_fraction, i, plot = False)
-    deconv_fwhm.append(deconv_popt[1])
-    deconv_fraction.append(deconv_popt[2])
-    deconv_amplitude.append(deconv_popt[3])
-    deconv_peak_two_thetas.append(deconv_popt[0])
+    for i in range(6):
+        _,deconv_popt = functions.get_deconvoluted_profile(fwhm,peak_two_thetas,amplitude,fraction,d_hkl,
+                                                           al_fwhm,al_fraction, i, plot = False)
+        deconv_fwhm.append(deconv_popt[1])
+        deconv_fraction.append(deconv_popt[2])
+        deconv_amplitude.append(deconv_popt[3])
+        deconv_peak_two_thetas.append(deconv_popt[0])
+        
+def bruteDeconvolution():
+    after_deconv   = []
+    global name_of_exceloutput
+    for c in range(len(peak_two_thetas)):
+        x1x2 = functions.Deconvolver(fwhm[c], fraction[c], al_fwhm[c], al_fraction[c])
+        deconv_fwhm.append(x1x2[0])
+        deconv_fraction.append(x1x2[1])
+        deconv_amplitude.append(amplitude[c])
+        deconv_peak_two_thetas.append(peak_two_thetas[c])
 
+    name_of_exceloutput = name_of_exceloutput[:-5] + '_bruteDeconv.xlsx'
 
-# Williamson-Hall analysis for deconvoluted sample. Figure also includes raw sample fwhms
-xforWH_measured = [4*np.sin(i*np.pi/360) for i in peak_two_thetas]
-xforWH_material = [4*np.sin(i*np.pi/360) for i in peak_two_thetas] # after deconvolution
+bruteDeconvolution() # Select either deconvolution or bruteDeconvolution
 
-yforWH_measured = [j*np.pi/180*np.cos(i*np.pi/360) for i,j in zip(peak_two_thetas,fwhm)]
-yforWH_material = [j*np.pi/180*np.cos(i*np.pi/360) for i,j in zip(peak_two_thetas,deconv_fwhm)] # after deconvolution
-
-# Show the fit
-plt.figure(figsize=(12,8))
-plt.title('Williamson-Hall Fit \n')
-plt.scatter(xforWH_measured, yforWH_measured, color = 'r') #,label = 'Measured FWHM'
-plt.scatter(xforWH_material, yforWH_material, color = 'k' ) #,label = 'Material FWHM'
-plt.xlabel('4Sin(\u03F4)')
-plt.ylabel('FWHM(rad)Cos(\u03F4)')
-plt.grid(linestyle='--')
-plt.xlim(0,4)
-plt.ylim(0,None)
-popt, pcov = curve_fit(functions.linear, xforWH_material, yforWH_material,bounds=([0,0], [3., 20000000.]))
-xmesh = np.linspace(0,4,100)
-plt.plot(xmesh, functions.linear(xmesh, *popt), 'k-',label = 'strain + crys. size fit')#,label = 'WH fit'
-
-# Print Results
-print('Williamson Hall results:')
-print('Strain (\u03B5)          : {} %'.format(popt[0]*100))
-print('Crystallite Size (L): {} Angstrom - K is taken 0.93'.format(0.93*wavelength/popt[1]))
-print('-*-*-*-*-*-*-')
-popt, pcov = curve_fit(functions.linear, xforWH_material, yforWH_material,bounds=([0,0], [3., 1e-16]))
-plt.plot(xmesh, functions.linear(xmesh, *popt), 'b--',label = 'Only strain fit')
-print('Strain (\u03B5) - only strain          : {} %'.format(popt[0]*100))
-print('Crystallite Size (L) - only strain : {} Angstrom - K is taken 0.93'.format(0.93*wavelength/popt[1]))
-print('-*-*-*-*-*-*-')
-popt, pcov = curve_fit(functions.linear, xforWH_material, yforWH_material,bounds=([0,0], [1e-16, 20000000.]))
-plt.plot(xmesh, functions.linear(xmesh, *popt), 'g--',label = 'Only crys. size fit')
-print('Strain (\u03B5) - only crystallite          : {} %'.format(popt[0]*100))
-print('Crystallite Size (L) - only crystallite : {} Angstrom - K is taken 0.93'.format(0.93*wavelength/popt[1]))
-print('-*-*-*-*-*-*-')
-# Print Results
-
-plt.legend()
-plt.show()
-# Show the fit
-
-
-# Scherrer equation only for 111 and 200 planes
-def scherrer(fwhm, theta):
-    K = 0.93
-    L = K*wavelength/fwhm/np.cos(theta)
-    return L
-
-L111_deconv = scherrer(deconv_fwhm[0]*np.pi/180, deconv_peak_two_thetas[0]*np.pi/360)
-L200_deconv = scherrer(deconv_fwhm[1]*np.pi/180, deconv_peak_two_thetas[1]*np.pi/360)
-L111        = scherrer(fwhm[0]*np.pi/180, peak_two_thetas[0]*np.pi/360)
-L200        = scherrer(fwhm[1]*np.pi/180, peak_two_thetas[1]*np.pi/360)
-print('Scherrer equation on 111 profile -no deconv.  -: {}'.format(L111))
-print('Scherrer equation on 111 profile -with deconv.-: {}'.format(L111_deconv))
-
-print('Scherrer equation on 200 profile -no deconv.  -: {}'.format(L200))
-print('Scherrer equation on 200 profile -with deconv.-: {}'.format(L200_deconv))
 
 # Print everyhing about measurement to an Excel file.
 planes = [[(1,1,1),(1,1,-1),(1,-1,1),(-1,1,1)],
@@ -194,12 +152,10 @@ deconv_sample_dict = {'fwhm': deconv_fwhm, 'peak_two_thetas': deconv_peak_two_th
 raw_sample_pd    = pd.DataFrame(raw_sample_dict)
 deconv_sample_pd = pd.DataFrame(deconv_sample_dict)
 
-writer = pd.ExcelWriter('excelSheets/' + name_of_exceloutput , engine='xlsxwriter')
+writer = pd.ExcelWriter('ExcelSheets/' + name_of_exceloutput , engine='xlsxwriter')
 
 raw_sample_pd.to_excel(writer, sheet_name='RawSample')
 deconv_sample_pd.to_excel(writer, sheet_name='DeconvSample')
 
 writer.save()
-
-
 

@@ -100,7 +100,7 @@ def plot_profiles_amplitudes(*args, structure = None,labellist = None):
     
 if __name__ == '__main__':
     
-    D5000 = pd.read_excel('D5000_560.xlsx',sheet_name='DeconvSample')
+    D5000 = pd.read_excel('GADDS_asdep.xlsx',sheet_name='DeconvSample')
     TiAlN_perfect      = create_perfect_TiAlN_structure(700, 4.16)
        
     plot_profiles_amplitudes(D5000, structure = TiAlN_perfect,labellist = ['Measurement'])
