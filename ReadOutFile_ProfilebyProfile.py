@@ -18,12 +18,12 @@ plt.style.use(['seaborn-paper', 'presentation'])
 
 fraction_inst        = 0.2     #Instrumental broadening fraction. Check alumina.py
 wavelength           = 1.54056 # CuKa1 in Angstrom
-deg_of_bck_poly      = 5       # Degree of background polynomial. Integer
-name_of_exceloutput  = 'GADDS_asdep.xlsx'
-name_of_outfileinput = 'outFiles//GADDS//asdepbb'
+deg_of_bck_poly      = 1      # Degree of background polynomial. Integer
+name_of_exceloutput  = 'GADDS_1170.xlsx'
+name_of_outfileinput = 'outFiles//GADDS//1170bb'
 
 #Enter expected peaks for smooth fitting
-expected_peaks       = [[37.37] , [43.35] , [63.29], [75.9],[79.8], [95.6]]
+expected_peaks       = [[37.4] , [43.35] , [63.29], [75.9,79.8], [95.6]] #],[
 
 #Enter UVW parameters obtained from alumina.py module.
 if 'D5000' in name_of_outfileinput:
@@ -58,9 +58,9 @@ for c,peak in enumerate(expected_peaks):
 
     #This will fit on the scatter and return the lmfit result
     if c == 4:
-        result = functions.fit_experimental_data(spec.x,spec.y,peak,deg_of_bck_poly=1)
+        result = functions.fit_experimental_data(spec.x,spec.y,peak,deg_of_bck_poly=deg_of_bck_poly)
     else:
-        result = functions.fit_experimental_data(spec.x,spec.y,peak,deg_of_bck_poly=0)
+        result = functions.fit_experimental_data(spec.x,spec.y,peak,deg_of_bck_poly=deg_of_bck_poly)
     # Show the fit
     f, (a0, a1) = plt.subplots(2,1,gridspec_kw = {'height_ratios':[3, 1]})
     f.set_size_inches(6, 10)
@@ -127,7 +127,7 @@ def bruteDeconvolution():
 
     name_of_exceloutput = name_of_exceloutput[:-5] + '_bruteDeconv.xlsx'
 
-bruteDeconvolution() # Select either deconvolution or bruteDeconvolution
+deconvolution() # Select either deconvolution or bruteDeconvolution
 
 
 # Print everyhing about measurement to an Excel file.

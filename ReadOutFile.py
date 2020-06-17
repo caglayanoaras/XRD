@@ -13,14 +13,14 @@ plt.style.use(['seaborn-paper', 'presentation'])
 
 #-*-*-*-*-*-*-*-*-*-*-*-*-INPUT-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-fraction_inst        = 0.5     #Instrumental broadening fraction. Check alumina.py
+fraction_inst        = 0.2     #Instrumental broadening fraction. Check alumina.py
 wavelength           = 1.54056 # CuKa1 in Angstrom
-deg_of_bck_poly      = 5       # Degree of background polynomial. Integer
-name_of_exceloutput  = 'D5000_asdep.xlsx'
-name_of_outfileinput = 'outFiles//D5000//new_tube//TiAlN_asdep_1mm_stripped.out'
+deg_of_bck_poly      = 5      # Degree of background polynomial. Integer
+name_of_exceloutput  = 'GADDS_960.xlsx'
+name_of_outfileinput = 'outFiles//D5000//new_tube//TiAlN_560C_1mm_stripped.out'
 
 #Enter expected peaks for smooth fitting
-expected_peaks       = [37.52 , 43.58 , 63.29, 75.9 , 79.8, 95.6]
+expected_peaks       = [37.52 , 43.58 , 63.29, 75.9 , 79.8, 95.6] #43.50 for 710
 
 #Enter UVW parameters obtained from alumina.py module.
 if 'D5000' in name_of_outfileinput:
@@ -33,7 +33,7 @@ if 'GADDS' in name_of_outfileinput:
 
 #Read from out file
 two_theta,intensity = functions.read_out_file(name_of_outfileinput)
-index     = [c for c,i in enumerate(two_theta) if i>34] # this bump is coming from sample holder.
+index     = [c for c,i in enumerate(two_theta) if i>34 and i<100] # this bump is coming from sample holder.
 intensity = [i for c,i in enumerate(intensity) if c in index]
 two_theta = [i for c,i in enumerate(two_theta) if c in index]
 
@@ -42,7 +42,7 @@ spec = Spectrum(two_theta,intensity )
 spec.normalize(mode = 'max',value = 100)
 
 #This will fit on the scatter and return the lmfit result
-result = functions.fit_experimental_data(spec.x,spec.y,expected_peaks,deg_of_bck_poly=5)
+result = functions.fit_experimental_data(spec.x,spec.y,expected_peaks,deg_of_bck_poly=deg_of_bck_poly)
 
 # Show the fit
 f, (a0, a1) = plt.subplots(2,1,gridspec_kw = {'height_ratios':[3, 1]})
@@ -54,21 +54,23 @@ residual = [a_i - b_i for a_i,b_i in zip(spec.y, result.best_fit)]
 a1.plot(two_theta, residual, lw = 1.2)
 a0.set_ylim([0,120])
 a1.set_ylim([-10,10])
-a0.set_xlim([35,105])
-a1.set_xlim([35,105])
+a0.set_xlim([35,100])
+a1.set_xlim([35,100])
 
 a0.grid( which='both', linestyle=':')
 a0.set_xlabel('2\u03F4',fontsize = 14)
 a0.set_ylabel('Intensity A.u.',fontsize = 14)
 
 a1.set_ylabel('Residual',fontsize = 14)
-a0.set_title('{} data points '.format(len(two_theta)),fontsize = 14)
+a0.set_title('TiAlN powder - D5000 '.format(len(two_theta)),fontsize = 14)
 a1.set_xticklabels([])
 
 a0.xaxis.labelpad = 10
 plt.show()
 # Show the fit
 
+import sys
+sys.exit()
 #keep the line profiles of sample as lists
 fwhm,peak_two_thetas,amplitude,fraction, _ = functions.get_profile_data(two_theta, result)
 d_hkl  = [wavelength/2/np.sin(np.pi/360*i) for i in peak_two_thetas]
@@ -93,7 +95,7 @@ def deconvolution():
         
 def bruteDeconvolution():
     after_deconv   = []
-
+    global name_of_exceloutput
     for c in range(len(peak_two_thetas)):
         x1x2 = functions.Deconvolver(fwhm[c], fraction[c], al_fwhm[c], al_fraction[c])
         after_deconv.append(x1x2)
@@ -102,7 +104,8 @@ def bruteDeconvolution():
     deconv_fraction   = [row[1] for row in after_deconv]
     deconv_amplitude  = [i for i in amplitude]
     deconv_peak_two_thetas = [i for i in peak_two_thetas]
-
+    name_of_exceloutput = name_of_exceloutput[:-5] + '_bruteDeconv.xlsx'
+    
 deconvolution() # Select either deconvolution or bruteDeconvolution
 
 

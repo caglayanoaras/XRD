@@ -78,15 +78,26 @@ def plot_profiles_amplitudes(*args, structure = None,labellist = None):
     for c,i in enumerate(args):
         if c == 0:
             color = 'k'
+            x = i['peak_two_thetas']
+            y = i['amplitude']
+            spec = Spectrum(x,y)
+            spec.normalize(mode = 'max', value = 90)
+            ax.scatter(spec.x, spec.y, marker='X',color = color,label = labellist[c])
         if c == 1:
             color = 'r'
+            x = i['peak_two_thetas']
+            y = i['amplitude']
+            spec = Spectrum(x,y)
+            spec.normalize(mode = 'max', value = 100)
+            ax.scatter(spec.x, spec.y, marker='X',color = color,label = labellist[c])
         if c == 2:
             color = 'b'
-        x = i['peak_two_thetas']
-        y = i['amplitude']
-        spec = Spectrum(x,y)
-        spec.normalize(mode = 'max', value = 100)
-        ax.scatter(spec.x, spec.y, marker='X',color = color,label = labellist[c])
+            x = i['peak_two_thetas']
+            y = i['amplitude']
+            spec = Spectrum(x,y)
+            spec.normalize(mode = 'max', value = 100)
+            ax.scatter(spec.x, spec.y, marker='X',color = color,label = labellist[c])
+
         for i,j in zip(spec.x,spec.y):
             ax.plot([i,i],[0,j],linestyle = '--', color = color ,alpha = 0.5)
 
@@ -100,7 +111,7 @@ def plot_profiles_amplitudes(*args, structure = None,labellist = None):
     
 if __name__ == '__main__':
     
-    D5000 = pd.read_excel('GADDS_asdep.xlsx',sheet_name='DeconvSample')
+    D5000 = pd.read_excel('D5000_560.xlsx',sheet_name='DeconvSample')
     TiAlN_perfect      = create_perfect_TiAlN_structure(700, 4.16)
        
     plot_profiles_amplitudes(D5000, structure = TiAlN_perfect,labellist = ['Measurement'])

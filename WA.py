@@ -18,14 +18,14 @@ e  = np.e
 plt.style.use(['seaborn-paper', 'presentation'])
 plt.rc('font', family='serif')
 
-DECONV      = pd.read_excel('excelSheets/GADDS_asdep.xlsx',sheet_name='DeconvSample')
+DECONV      = pd.read_excel('excelSheets/GADDS_1060.xlsx',sheet_name='DeconvSample')
 NOT_DECONV  = pd.read_excel('excelSheets/GADDS_asdep.xlsx',sheet_name='RawSample')
 
 measurement = DECONV
 
 wavelength = 1.54056
 indi = 401
- 
+wh_strain = 0.32
 def profile_func(measurement,LP, pointnum):
     '''
     Args: measurement > pandas df of measurement
@@ -121,7 +121,7 @@ def solve_log_normal(larea, lvolume):
             return [first_eq, second_eq]
         return 0
     try:
-        solution = least_squares(f, (15, 1), bounds = ((0, 0), (50, 5)),ftol = 1e-10,xtol = 1e-10,gtol = 1e-10)
+        solution = least_squares(f, (15, 1), bounds = ((0, 0), (100, 100)),ftol = 1e-10,xtol = 1e-10,gtol = 1e-10)
 ##        print(solution)
     except:
         print('Cannot fit')
@@ -134,10 +134,10 @@ def log_normal(D_0,sigma,x):
 def WA(plane_dir ):
     
     if plane_dir == 111:
-        freq1, coefs1 = get_fourier_coefs(measurement, 0, plot = True)
+        freq1, coefs1 = get_fourier_coefs(measurement, 0, plot = False)
         freq2, coefs2 = get_fourier_coefs(measurement, 4, plot = False)
     if plane_dir == 200:
-        freq1, coefs1 = get_fourier_coefs(measurement, 1, plot = True)    
+        freq1, coefs1 = get_fourier_coefs(measurement, 1, plot = False)    
         freq2, coefs2 = get_fourier_coefs(measurement, 5, plot = False)
     
     coefslog1 = np.log(coefs1)
@@ -188,64 +188,65 @@ def WA(plane_dir ):
     dummyy = reg.coef_[0]*dummyx + reg.intercept_
     plt.plot(dummyx, dummyy, 'r--')
     plt.scatter(-reg.intercept_/reg.coef_,0,s=35)
+    Larea   = -reg.intercept_/reg.coef_*a/10 # in nm
+    Lvolume = round(np.trapz(Asize)*2, 4)*a/10
+    print('<L>area   ' + '{}'.format(plane_dir) + ' direction: {}'.format(Larea))
+    print('<L>volume ' + '{}'.format(plane_dir) + ' direction: {}'.format(Lvolume))      
+    print('*-*-*-*')
     plt.grid()
     plt.show()
     
-    return rmsStrain
+    return rmsStrain, Larea[0], Lvolume
 
+    
 if __name__ == '__main__':
        
-##    strain111 = WA(111)
-    strain200 = WA(200)
-    
+    strain111, Larea111, Lvolume111 = WA(111)
+    a111 = a
+    strain200, Larea200, Lvolume200 = WA(200)
+    a200 = a
 ## This part is about strain versus L plot
-    plt.figure(figsize = (14,6))
+    plt.figure(figsize = (14,6.5))
 ##    plt.title('Strain over length L')
     plt.xlabel('L (Å)')
-    plt.ylabel('Strain (%)')
+    plt.ylabel('RMS Strain (%)')
     plt.grid()
-##    plt.axhline(y=0.39, color ='r', linestyle= '--',label='WH')
-    LL = [i*a for i in range(15)]
-    plt.xticks(LL)
-##    plt.plot(LL[1:],[i*100 for i in strain111[1:15]],'o-',label='111')
-    plt.plot(LL[1:],[i*100 for i in strain200[1:15]],'o-')#,label='200')
+    plt.axhline(y=wh_strain, color ='r', linestyle= '--',label='W-H')
+    LL    = [i*a200 for i in range(17)]
+    LL111 = [i*a111 for i in range(15)]
+    plt.xticks(LL111)
+    plt.plot(LL111[1:],[i*100 for i in strain111[1:15]],'o-',label='111')
+    plt.plot(LL[1:],[i*100 for i in strain200[1:17]],'o-',label='200')
 
     plt.legend()
     plt.show()
-
-
-
-    
-
-
-##    Larea    = round(float(-reg.intercept_/reg.coef_), 4)*a/10
-##    Lvolume  = round(np.trapz(Asize)*2, 4)*a/10
-##
-##    print('<L>area   ' + '{}'.format(plane_dir) + ' direction: {}'.format(Larea))
-##    print('<L>volume ' + '{}'.format(plane_dir) + ' direction: {}'.format(Lvolume))      
-##    print('*-*-*-*')
-
     
 ## This part is about crystallite size distribution
-####    D_0, sigma = solve_log_normal(Larea, Lvolume).x
-####    print('D_0(median)    , ' + '{}'.format(plane_dir) + ' plane : {}'.format(round(D_0,4)))
-####    print('Sigma(variance), ' + '{}'.format(plane_dir) + ' plane : {}'.format(round(sigma,4)))
-####
-####    print('*-*-*-*')
-####    
-####    print('<D>area   ' + '{}'.format(plane_dir) + ' direction: {}'.format(D_0*np.exp(5/2*np.log(sigma)*np.log(sigma))))
-####    print('<D>volume ' + '{}'.format(plane_dir) + ' direction: {}'.format(D_0*np.exp(7/2*np.log(sigma)*np.log(sigma))))
-####    print('*-*-*-*')
-####
-####    xforlognormal    = np.linspace(0.0001, 40, num = 1500)
-####    yforlognormal = log_normal(D_0, sigma, xforlognormal)
-####    
-####    plt.figure(figsize=(14,7))
-####    plt.title('-Spherical- Crystallite size dist for {200}')
-####    plt.xlabel('Crystallite Size -Nm-')
-####    plt.ylabel('Frequency')
-####    plt.grid()
-####    plt.plot(xforlognormal, yforlognormal,color = 'k')
-####    plt.axvline(x=D_0, color ='r', linestyle= '--',label='median')
-####    plt.legend()
-####    plt.show()  
+    Larea     = Larea111
+    Lvolume   = Lvolume111
+    plane_dir = '111'
+    
+    D_0, sigma = solve_log_normal(Larea, Lvolume).x
+    print('D_0(median)    , ' + '{}'.format(plane_dir) + ' plane : {}'.format(round(D_0,4)))
+    print('Sigma(variance), ' + '{}'.format(plane_dir) + ' plane : {}'.format(round(sigma,4)))
+
+    print('*-*-*-*')
+    
+    print('<D>area   ' + '{}'.format(plane_dir) + ' direction: {}'.format(D_0*np.exp(5/2*np.log(sigma)*np.log(sigma))))
+    print('<D>volume ' + '{}'.format(plane_dir) + ' direction: {}'.format(D_0*np.exp(7/2*np.log(sigma)*np.log(sigma))))
+    print('*-*-*-*')
+
+    xforlognormal    = np.linspace(0.0001, 80, num = 1500)
+    yforlognormal = log_normal(D_0, sigma, xforlognormal)
+    
+    plt.figure(figsize=(14,7))
+##    plt.title('-Spherical- Crystallite size dist for {}'.format(plane_dir))
+    plt.xlabel('Crystallite Size(Nm)')
+    plt.ylabel('Frequency')
+    plt.grid()
+    plt.plot(xforlognormal, yforlognormal,color = 'k')
+    plt.axvline(x=D_0, color ='r', linestyle= '--',label='Median')
+    plt.axvline(x=D_0*np.exp(5/2*np.log(sigma)*np.log(sigma)), color ='b', linestyle= '--',label='<D>area')
+    plt.axvline(x=D_0*np.exp(7/2*np.log(sigma)*np.log(sigma)), color ='g', linestyle= '--',label='<D>volume')
+    plt.legend()
+    plt.show()  
