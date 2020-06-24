@@ -18,7 +18,7 @@ e  = np.e
 plt.style.use(['seaborn-paper', 'presentation'])
 plt.rc('font', family='serif')
 
-DECONV      = pd.read_excel('excelSheets/GADDS_1060.xlsx',sheet_name='DeconvSample')
+DECONV      = pd.read_excel('excelSheets/GADDS_960.xlsx',sheet_name='DeconvSample')
 NOT_DECONV  = pd.read_excel('excelSheets/GADDS_asdep.xlsx',sheet_name='RawSample')
 
 measurement = DECONV
@@ -217,7 +217,7 @@ if __name__ == '__main__':
     plt.xticks(LL111)
     plt.plot(LL111[1:],[i*100 for i in strain111[1:15]],'o-',label='111')
     plt.plot(LL[1:],[i*100 for i in strain200[1:17]],'o-',label='200')
-
+    plt.ylim([0.25,1.8])
     plt.legend()
     plt.show()
     

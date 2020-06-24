@@ -18,7 +18,7 @@ plt.rc('font', family='serif')
 
 wavelength         = 1.54056
 
-excel_path         = 'excelSheets/GADDS_1060.xlsx'
+excel_path         = 'excelSheets/GADDS_asdep.xlsx'
 measurement_deconv = pd.read_excel(excel_path, sheet_name='DeconvSample', index_col=0)
 measurement        = pd.read_excel(excel_path, sheet_name='RawSample', index_col=0)
 
@@ -34,8 +34,8 @@ plt.figure(figsize=(12,8))
 #plt.title('Williamson-Hall Fit \n')
 #plt.scatter(xforWH_measured, yforWH_measured, color = 'k') #,label = 'Measured FWHM'
 plt.scatter(xforWH_material, yforWH_material, color = 'r' ) #,label = 'Material FWHM'
-plt.xlabel('4Sin\u03F4')
-plt.ylabel('FWHM(rad)Cos\u03F4')
+plt.xlabel('4sin\u03F4')
+plt.ylabel('FWHM(rad)cos\u03F4')
 plt.grid(linestyle='--')
 plt.xlim(0,4)
 plt.ylim(0,None)
