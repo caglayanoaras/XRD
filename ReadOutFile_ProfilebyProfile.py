@@ -19,11 +19,11 @@ plt.style.use(['seaborn-paper', 'presentation'])
 fraction_inst        = 0.2     #Instrumental broadening fraction. Check alumina.py
 wavelength           = 1.54056 # CuKa1 in Angstrom
 deg_of_bck_poly      = 1      # Degree of background polynomial. Integer
-name_of_exceloutput  = 'GADDS_1170.xlsx'
-name_of_outfileinput = 'outFiles//GADDS//1170bb'
+name_of_exceloutput  = 'GADDS_1060.xlsx'
+name_of_outfileinput = 'outFiles//GADDS//1060bb'
 
 #Enter expected peaks for smooth fitting
-expected_peaks       = [[37.4] , [43.35] , [63.29], [75.9,79.8], [95.6]] #],[
+expected_peaks       = [[37.4] , [43.35] , [63.29], [75.9],[79.8], [95.6]] #],[
 
 #Enter UVW parameters obtained from alumina.py module.
 if 'D5000' in name_of_outfileinput:
@@ -124,10 +124,11 @@ def bruteDeconvolution():
         deconv_fraction.append(x1x2[1])
         deconv_amplitude.append(amplitude[c])
         deconv_peak_two_thetas.append(peak_two_thetas[c])
+        print(x1x2)
 
     name_of_exceloutput = name_of_exceloutput[:-5] + '_bruteDeconv.xlsx'
 
-deconvolution() # Select either deconvolution or bruteDeconvolution
+bruteDeconvolution() # Select either deconvolution or bruteDeconvolution
 
 
 # Print everyhing about measurement to an Excel file.

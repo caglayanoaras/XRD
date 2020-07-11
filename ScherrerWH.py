@@ -18,7 +18,7 @@ plt.rc('font', family='serif')
 
 wavelength         = 1.54056
 
-excel_path         = 'excelSheets/GADDS_asdep.xlsx'
+excel_path         = 'excelSheets/GADDS_1060.xlsx'
 measurement_deconv = pd.read_excel(excel_path, sheet_name='DeconvSample', index_col=0)
 measurement        = pd.read_excel(excel_path, sheet_name='RawSample', index_col=0)
 

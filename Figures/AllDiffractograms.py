@@ -27,6 +27,7 @@ tick_list     = [material + '$^\circ$C' for material in material_list]
 tick_list[0]  = 'asdeposited'
 two_theta = np.linspace(30,100,num=1000)
 plt.figure(figsize = (14,10))
+plt.gca().yaxis.tick_right()
 for c,material in enumerate(material_list):
 
     measurement = pd.read_excel('..//excelSheets//GADDS_{}.xlsx'.format(material),
@@ -44,8 +45,10 @@ for c,material in enumerate(material_list):
     spect.normalize(mode="max", value=100)
     plt.plot(spect.x, spect.y + 110*c, c = 'k')
     plt.yticks([c*110 for c in range(len(tick_list))], tick_list,fontsize=20)
+
 plt.xlabel('2\u03F4 $(^\circ)$')
-plt.grid(b=True, which='major', color='#666666', linestyle='-')
-plt.minorticks_on()
-plt.grid(b=True, which='minor', color='k', linestyle='--', alpha = 0.4)
+plt.ylabel('Intensity (a.u.)')
+##plt.grid(b=True, which='major', color='#666666', linestyle='-')
+##plt.minorticks_on()
+##plt.grid(b=True, which='minor', color='k', linestyle='--', alpha = 0.4)
 plt.show()

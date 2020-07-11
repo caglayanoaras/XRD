@@ -15,9 +15,9 @@ plt.style.use(['seaborn-paper', 'presentation'])
 
 fraction_inst        = 0.2     #Instrumental broadening fraction. Check alumina.py
 wavelength           = 1.54056 # CuKa1 in Angstrom
-deg_of_bck_poly      = 5      # Degree of background polynomial. Integer
-name_of_exceloutput  = 'GADDS_960.xlsx'
-name_of_outfileinput = 'outFiles//GADDS//decided//TiAlN960_two_1.out'
+deg_of_bck_poly      = 1      # Degree of background polynomial. Integer
+name_of_exceloutput  = 'GADDS_560.xlsx'
+name_of_outfileinput = 'outFiles//GADDS//decided//TiAlN560_02.out'
 
 #Enter expected peaks for smooth fitting
 expected_peaks       = [37.52 , 43.58 , 63.29, 75.9 , 79.8, 95.6] #43.50 for 710

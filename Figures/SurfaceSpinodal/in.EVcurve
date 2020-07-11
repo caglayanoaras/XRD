@@ -1,0 +1,12 @@
+units         metal
+boundary      p p p
+
+read_data     structure
+
+pair_style    meam
+pair_coeff    * * library.NAlTi N Al Ti meam.NAlTi Al N Ti
+
+thermo_style  one
+thermo 	      1
+dump          output all atom 100 dump.atoms
+minimize      1.0e-10 1.0e-12 1000 100000
