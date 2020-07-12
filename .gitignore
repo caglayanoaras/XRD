@@ -6,7 +6,8 @@ __pycache__/
 
 AECCAR0
 AECCAR2
-
+27_446_04_TiAlN/
+31_447_04_TiAlN/
 *.npy
 !layer_0.npy
 !edist_atom_192_192_192.npy
