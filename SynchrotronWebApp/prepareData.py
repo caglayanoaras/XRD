@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from os      import listdir
 from os.path import isfile, join
 
+from pymatgen.core.spectrum import Spectrum
+
 folder_path = '31_447_04_TiAlN'
 files = [f for f in listdir(folder_path) if isfile(join(folder_path, f))]
 
@@ -29,9 +31,14 @@ for measurement in measurement_file:
 ##    plt.title(title)
 ##    plt.plot(data[:,0],data[:,1])
 ##    plt.show()
+    filter_data = data[:,0]>22
+    data_filt  = data[filter_data, :]
     temperature_list.append(float(title[3:8]))
-    measurement_list_q.append(data[:,0])
-    measurement_list_intensity.append(data[:,1])
+    spec = Spectrum(data_filt[:,0],data_filt[:,1] )
+    spec.normalize(mode = 'max',value = 100)
+    
+    measurement_list_q.append(spec.x)
+    measurement_list_intensity.append(spec.y)
 
     f.close()
 

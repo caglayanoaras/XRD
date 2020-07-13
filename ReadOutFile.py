@@ -43,7 +43,8 @@ spec.normalize(mode = 'max',value = 100)
 
 #This will fit on the scatter and return the lmfit result
 result = functions.fit_experimental_data(spec.x,spec.y,expected_peaks,deg_of_bck_poly=deg_of_bck_poly)
-
+import sys
+sys.exit()
 # Show the fit
 f, (a0, a1) = plt.subplots(2,1,gridspec_kw = {'height_ratios':[3, 1]})
 f.set_size_inches(8, 16)
