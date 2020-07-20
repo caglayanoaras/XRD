@@ -61,6 +61,7 @@ def profile_func_2theta_to_h3(spectrum2theta):
     '''
     cos = np.cos(spectrum2theta.x *np.pi/360)
     y = np.divide(spectrum2theta.y, cos) * wavelength/a
+##    y = spectrum2theta.y
     x = 2*a/wavelength* np.sin(spectrum2theta.x *np.pi/360)
     profileh = Spectrum(x,y)
     popt,_ = curve_fit(pseudo_voigt, profileh.x, profileh.y,bounds = ([profileh.x.min(), 0, 0, 0,],
@@ -186,6 +187,8 @@ def WA(plane_dir ):
     reg = LinearRegression().fit( np.arange(5).reshape(-1,1),Asize[:5])   
     dummyx = np.linspace(0,-reg.intercept_/reg.coef_,num=50)
     dummyy = reg.coef_[0]*dummyx + reg.intercept_
+    print(dummyy)
+    print(dummyx)
     plt.plot(dummyx, dummyy, 'r--')
     plt.scatter(-reg.intercept_/reg.coef_,0,s=35)
     Larea   = -reg.intercept_/reg.coef_*a/10 # in nm
