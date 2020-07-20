@@ -32,7 +32,7 @@ data==0.4
 dataclasses==0.6
 decorator==4.3.0
 defusedxml==0.6.0
-Django==1.6.11
+Django==1.11.29
 entrypoints==0.3
 et-xmlfile==1.0.1
 Flask==1.0.2
